@@ -1,3 +1,5 @@
+/* eslint-disable global-require */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 
 describe('it should capture http requests globally', () => {
@@ -5,15 +7,16 @@ describe('it should capture http requests globally', () => {
     jest.resetModules();
   });
   it('should output a har file on requests', async () => {
+    if (fs.existsSync('test2.har')) fs.unlinkSync('test2.har');
     const { captureHTTPsGlobal } = await import('../src/capture-http');
-    const http = await import('http');
-    const https = await import('https');
+    const http = require('http'); // Have to use require here. `import()` adds redefinition restrictions on module functs that prevents patching
+    const https = require('https');
     captureHTTPsGlobal(http, 'test1.har');
     captureHTTPsGlobal(https, 'test2.har');
-    const axios = await (await import('axios')).default;
+    const axios = (await import('axios')).default;
 
-    await axios.get('https://google.com');
-    const exists = fs.existsSync('test1.har');
+    await axios.get('https://www.example.com');
+    const exists = fs.existsSync('test2.har');
     expect(exists).toBeTruthy();
   });
 });

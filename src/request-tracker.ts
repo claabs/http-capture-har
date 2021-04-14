@@ -79,6 +79,7 @@ function assembleHarRequest(req: http.ClientRequest): har.Request {
 }
 
 function readResponseBody(res: http.IncomingMessage): string {
+  // This doesn't work. How do we make it work without promises?
   const chunks: string[] = [];
   res.setEncoding('utf8');
   let chunk: string;

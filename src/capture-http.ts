@@ -126,7 +126,7 @@ function enableCapture(
       requestTracker.close(e);
     };
 
-    const optionsCopy = objectWithoutProperties(options, ['Segment'], true);
+    const optionsCopy = objectWithoutProperties(options, ['Segment'], true); // Not needed?
 
     const newCallback = (_res: http.IncomingMessage): void => {
       const res = _res as CallbackRes;
@@ -174,14 +174,16 @@ function enableCapture(
   };
 
   module.__request = module.request;
-  module.request = (function captureHTTPsRequest(...args: RequestParametersIntersect[]) {
+  const requestWrapper = (...args: RequestParametersIntersect[]) => {
     return captureOutgoingHTTPs(module.__request, ...(args as any));
-  } as unknown) as typeof http.request;
+  };
+  module.request = (requestWrapper as unknown) as typeof http.request;
 
   module.__get = module.get;
-  module.get = (function captureHTTPsGet(...args: RequestParametersIntersect[]) {
+  const getWrapper = (...args: RequestParametersIntersect[]) => {
     return captureOutgoingHTTPs(module.__get, ...(args as any));
-  } as unknown) as typeof http.get;
+  };
+  module.get = (getWrapper as unknown) as typeof http.get;
 }
 
 /**
